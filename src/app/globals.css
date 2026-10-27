@@ -1,0 +1,94 @@
+@import "tailwindcss";
+
+/* 디자인 시스템 '겹침' (docs/design.md). 두 잉크(분홍·파랑)가 겹친 자리에서 보라가 생긴다. */
+:root {
+  --ink: #17102e;
+  --paper: #f2f3f7;
+  --pink: #ff4fa3;
+  --blue: #2d5bff;
+  --violet: #6a2be6;
+  --yellow: #ffe600;
+  --sub: #4a4363;
+  --hard: 6px 6px 0 var(--ink);
+  --ease-pop: cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@theme inline {
+  --color-ink: var(--ink);
+  --color-paper: var(--paper);
+  --color-pink: var(--pink);
+  --color-blue: var(--blue);
+  --color-violet: var(--violet);
+  --color-yellow: var(--yellow);
+  --color-sub: var(--sub);
+  --font-sans: var(--font-pretendard), -apple-system, "Apple SD Gothic Neo",
+    "Noto Sans KR", sans-serif;
+  --font-display: var(--font-black-han), var(--font-pretendard), sans-serif;
+  --font-mono: var(--font-dm-mono), ui-monospace, monospace;
+}
+
+html {
+  color-scheme: light;
+}
+
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  font-size: 17px;
+  line-height: 1.65;
+  word-break: keep-all;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+:focus-visible {
+  outline: 3px solid var(--blue);
+  outline-offset: 3px;
+}
+
+@keyframes pop {
+  from {
+    opacity: 0;
+    transform: scale(0.94) translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.reveal {
+  animation: pop 0.5s var(--ease-pop) both;
+  animation-delay: var(--d, 0ms);
+}
+
+@keyframes wob {
+  0%,
+  100% {
+    transform: rotate(-2deg);
+  }
+  50% {
+    transform: rotate(2deg) translateY(-6px);
+  }
+}
+
+.wob {
+  animation: wob 4s ease-in-out infinite;
+  transform-origin: 50% 90%;
+}
+
+.halftone {
+  background-image: radial-gradient(var(--ink) 1.2px, transparent 1.6px);
+  background-size: 7px 7px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal,
+  .wob {
+    animation: none;
+  }
+  * {
+    transition: none !important;
+  }
+}
