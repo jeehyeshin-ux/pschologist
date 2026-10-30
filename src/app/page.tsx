@@ -2,7 +2,9 @@
 
 import Link from "next/link";
 import { Pogae } from "@/components/Pogae";
+import { ShareBar } from "@/components/ShareBar";
 import { Button, Disclaimer, LinkButton, Say, Shell } from "@/components/ui";
+import { SITE_URL } from "@/lib/site";
 import { TESTS } from "@/data/tests";
 import { classify } from "@/lib/character/classify";
 import { clearAll, useResults } from "@/lib/storage";
@@ -120,11 +122,23 @@ export default function Home() {
         )}
       </div>
 
+      <section className="mt-10">
+        <h2 className="font-display text-[24px] leading-tight">친구에게 알려 주기</h2>
+        <div className="mt-3">
+          <ShareBar
+            url={SITE_URL}
+            title="마음 탐색실"
+            text="다섯 가지 심리 이야기로 나를 들여다보고, 8가지 캐릭터 중 나를 닮은 하나를 만나 봐."
+          />
+        </div>
+      </section>
+
       <section className="mt-10 border-[3px] border-ink bg-white px-4 py-4 text-sm font-medium leading-relaxed">
         <p className="font-display text-[20px] leading-tight">개인정보는 이렇게 다뤄요</p>
         <p className="mt-1">
           이름이나 연락처를 묻지 않아요. 답과 결과는 이 기기의 브라우저 안에서만 계산하고 서버로 보내지
-          않아요. 결과는 동의하신 경우에만 이 기기에 저장해요.
+          않아요. 결과는 동의하신 경우에만 이 기기에 저장해요. 단, 캐릭터 화면에서 "나와 닮았나요?"를 직접
+          누르면 캐릭터 번호와 응답만 익명으로 집계돼요.
         </p>
         {ready && (results.length > 0 || consent) && (
           <button

@@ -4,6 +4,9 @@ import { useMemo } from "react";
 import { CharacterMap } from "@/components/charts/CharacterMap";
 import { SpectrumBar } from "@/components/charts/Bars";
 import { CharacterArt } from "@/components/CharacterArt";
+import { FeedbackBox } from "@/components/FeedbackBox";
+import { ShareBar } from "@/components/ShareBar";
+import { characterUrl } from "@/lib/site";
 import { Card, Disclaimer, Easy, LinkButton, Shell, Title, TopBar } from "@/components/ui";
 import { adlerPositions } from "@/data/content/adler";
 import { archetypeInfo } from "@/data/content/jung-analytic";
@@ -96,6 +99,23 @@ export default function CharacterPage() {
             </p>
           )}
         </>
+      )}
+
+      {character && (
+        <Card className="mt-4" delay={30}>
+          <h2 className="font-display text-[24px] leading-tight">친구에게도 보여 줄까요?</h2>
+          <p className="mb-4 mt-1 text-sm text-sub">이미지와 공유 문구에 주소가 함께 들어가요.</p>
+          <ShareBar
+            url={characterUrl(character.index)}
+            title={`나는 '${character.name}'`}
+            text={`나는 '${character.name}'에 가깝대요. 너는 어떤 캐릭터일까?`}
+            imageSrc={`/share/s${character.index}.png`}
+            imageName={`mind-lab-${character.index}.png`}
+          />
+          <div className="mt-6 border-t-[3px] border-ink pt-5">
+            <FeedbackBox index={character.index} />
+          </div>
+        </Card>
       )}
 
       {character && (

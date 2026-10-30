@@ -29,7 +29,6 @@ export const metadata: Metadata = {
   title: "마음 탐색실",
   description:
     "다섯 가지 심리학 이야기로 나를 돌아보는 자기이해 서비스. 임상 진단이나 전문 심리평가를 대체하지 않아요.",
-  robots: { index: false, follow: false },
   openGraph: {
     title: "마음 탐색실",
     description: "다섯 가지 심리 이야기로 나를 들여다보고, 8가지 캐릭터 중 나를 닮은 하나를 만나 보세요.",
