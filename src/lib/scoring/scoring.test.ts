@@ -36,6 +36,19 @@ describe("문항 데이터", () => {
   });
 });
 
+describe("무조건 동의 편향 방지", () => {
+  it("척도마다 정방향과 역방향이 같은 수라서, 전부 5나 전부 1로 답하면 50이다", () => {
+    for (const items of [temperamentItems, jungTypeItems, freudItems, jungAnalyticItems]) {
+      for (const v of [1, 5]) {
+        const s = scoreScales(items, fill(items, v))!;
+        for (const [scale, score] of Object.entries(s)) {
+          expect([scale, score]).toEqual([scale, 50]);
+        }
+      }
+    }
+  });
+});
+
 describe("scoreScales", () => {
   it("전부 3이면 모든 척도가 50", () => {
     const s = scoreScales(temperamentItems, fill(temperamentItems, 3))!;

@@ -3,11 +3,11 @@
 import { useMemo } from "react";
 import { CharacterMap } from "@/components/charts/CharacterMap";
 import { SpectrumBar } from "@/components/charts/Bars";
-import { Pogae } from "@/components/Pogae";
+import { CharacterArt } from "@/components/CharacterArt";
 import { Card, Disclaimer, Easy, LinkButton, Shell, Title, TopBar } from "@/components/ui";
 import { adlerPositions } from "@/data/content/adler";
 import { archetypeInfo } from "@/data/content/jung-analytic";
-import { axisInfo, characters } from "@/data/content/characters";
+import { axisInfo, characterOf, characters } from "@/data/content/characters";
 import { ARCHETYPES } from "@/data/items/jung-analytic";
 import { TESTS } from "@/data/tests";
 import { classify } from "@/lib/character/classify";
@@ -62,22 +62,31 @@ export default function CharacterPage() {
       {character && (
         <>
           <Card className="mt-8" tone="yellow">
-            <Pogae pose="cheer" className="mx-auto w-full max-w-[300px]" wobble />
+            <CharacterArt index={character.index} name={character.name} className="mx-auto w-full max-w-[360px]" />
             <p className="mt-2 font-mono text-sm font-medium">{character.tagline}</p>
             <h2 className="mt-1 font-display text-[clamp(56px,16vw,84px)] leading-[0.95] tracking-[-0.03em]">{character.name}</h2>
             <p className="mt-4 text-base leading-relaxed">{character.intro}</p>
-            <h3 className="mt-6 font-display text-[24px] leading-tight">이런 힘이 있어요</h3>
+            <h3 className="mt-6 font-display text-[24px] leading-tight">이런 적 있죠?</h3>
+            <ul className="mt-2 list-disc space-y-1 pl-5">
+              {character.scenes.map((t) => (
+                <li key={t}>{t}</li>
+              ))}
+            </ul>
+            <h3 className="mt-5 font-display text-[24px] leading-tight">이런 힘이 있어요</h3>
             <ul className="mt-2 list-disc space-y-1 pl-5">
               {character.strengths.map((t) => (
                 <li key={t}>{t}</li>
               ))}
             </ul>
-            <h3 className="mt-5 font-display text-[24px] leading-tight">살짝 신경 쓰면 좋아요</h3>
+            <h3 className="mt-5 font-display text-[24px] leading-tight">이런 약점도 있어요</h3>
             <ul className="mt-2 list-disc space-y-1 pl-5">
-              {character.cares.map((t) => (
+              {character.weaknesses.map((t) => (
                 <li key={t}>{t}</li>
               ))}
             </ul>
+            <p className="mt-4 border-[3px] border-ink bg-white px-4 py-3 font-bold">
+              한 줄 처방 · {character.tip}
+            </p>
             <h3 className="mt-5 font-display text-[24px] leading-tight">잘 맞는 곳</h3>
             <p className="mt-2">{character.place}</p>
           </Card>
@@ -87,6 +96,44 @@ export default function CharacterPage() {
             </p>
           )}
         </>
+      )}
+
+      {character && (
+        <Card className="mt-4" delay={50}>
+          <h2 className="font-display text-[24px] leading-tight">나와 어울리는 유형, 어긋나기 쉬운 유형</h2>
+          <p className="mt-1 text-sm text-sub">
+            재미로 보는 이야기예요. 연구로 확인된 궁합이 아니라, 세 방향이 겹치고 다른 정도로 이 서비스가 정리한 거예요.
+          </p>
+          {(
+            [
+              ["어울려요", character.match],
+              ["리듬이 달라서 맞추는 데 힘이 들어요", character.clash],
+            ] as const
+          ).map(([label, list]) => (
+            <div key={label} className="mt-4">
+              <p className="font-display text-[20px] leading-tight">{label}</p>
+              <ul className="mt-2 space-y-3">
+                {list.map((m) => {
+                  const other = characterOf(m.index);
+                  if (!other) return null;
+                  return (
+                    <li key={m.index} className="flex items-start gap-3">
+                      <CharacterArt
+                        index={other.index}
+                        name={other.name}
+                        className="w-20 shrink-0 border-[3px] border-ink bg-white"
+                      />
+                      <div>
+                        <p className="font-black">{other.name}</p>
+                        <p className="text-[15px] leading-relaxed">{m.why}</p>
+                      </div>
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
+          ))}
+        </Card>
       )}
 
       {c.resolved > 0 && (

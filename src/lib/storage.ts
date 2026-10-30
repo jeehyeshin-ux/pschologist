@@ -98,3 +98,32 @@ export function useResults() {
 
   return state;
 }
+
+/**
+ * 검사 도중 응답을 이 탭(sessionStorage)에만 잠깐 둔다. 새로고침해도 이어서 할 수 있게 하기 위한 것이며,
+ * 탭을 닫으면 사라지고 서버로 가지 않는다.
+ */
+export interface Progress {
+  i: number;
+  answers: Record<string, number>;
+  /** 지금까지 문항을 보고 있던 누적 시간(ms) */
+  elapsed: number;
+}
+const PROGRESS = "psy:progress:";
+
+export function loadProgress(id: TestId): Progress | null {
+  return safe(() => {
+    const raw = sessionStorage.getItem(PROGRESS + id);
+    if (!raw) return null;
+    const p = JSON.parse(raw) as Progress;
+    return Number.isInteger(p.i) && p.answers && typeof p.answers === "object" ? p : null;
+  }, null);
+}
+
+export function saveProgress(id: TestId, p: Progress) {
+  safe(() => sessionStorage.setItem(PROGRESS + id, JSON.stringify(p)), undefined);
+}
+
+export function clearProgress(id: TestId) {
+  safe(() => sessionStorage.removeItem(PROGRESS + id), undefined);
+}

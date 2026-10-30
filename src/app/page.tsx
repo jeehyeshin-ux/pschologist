@@ -57,8 +57,8 @@ export default function Home() {
         </div>
       </section>
 
-      <p className="relative mt-6 max-w-[28ch] text-[18px] font-bold leading-snug">
-        두 가지 마음을 겹쳐 놓으면, 혼자서는 안 보이던 내가 나타나요. 전부 해도, 마음에 드는 것만 골라서 해도 괜찮아요.
+      <p className="relative mt-6 max-w-[32ch] text-[18px] font-bold leading-snug">
+        다섯 가지 심리 이야기로 나를 들여다보고, 결과를 겹쳐서 나만의 캐릭터를 만나요. 전부 하면 약 20분, 마음에 드는 것만 골라 해도 괜찮아요. 기질이나 융 유형 탐색 하나만 마쳐도 캐릭터가 나와요.
       </p>
 
       <ul className="mt-10 flex flex-col gap-5">

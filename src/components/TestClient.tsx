@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { AdlerFlow } from "@/components/flows/AdlerFlow";
 import { ChoiceFlow } from "@/components/flows/ChoiceFlow";
 import { LikertFlow } from "@/components/flows/LikertFlow";
@@ -15,9 +15,10 @@ import { JUNG_INPUT, TEMPERAMENT_INPUT, TESTS } from "@/data/tests";
 import { jungFromLetters, temperamentFromInput } from "@/lib/build-result";
 import { interleave } from "@/lib/order";
 import { scoreScales } from "@/lib/scoring";
-import { saveResult } from "@/lib/storage";
+import { checkQuality, type QualityFlag } from "@/lib/scoring/quality";
+import { loadProgress, saveResult } from "@/lib/storage";
 import { TEST_THEME } from "@/lib/theme";
-import type { Item, TestId } from "@/lib/types";
+import type { Answers, Item, TestId } from "@/lib/types";
 
 const ITEMS: Partial<Record<TestId, Item[]>> = {
   temperament: temperamentItems,
@@ -26,7 +27,7 @@ const ITEMS: Partial<Record<TestId, Item[]>> = {
   "jung-analytic": jungAnalyticItems,
 };
 
-type Stage = "intro" | "mode" | "likert" | "input";
+type Stage = "intro" | "mode" | "likert" | "input" | "check";
 
 export function TestClient({ id }: { id: TestId }) {
   const router = useRouter();
@@ -34,6 +35,8 @@ export function TestClient({ id }: { id: TestId }) {
   const tone = TEST_THEME[id].tone;
   const [stage, setStage] = useState<Stage>("intro");
   const [mode, setMode] = useState<"test" | "input">("test");
+  const [pending, setPending] = useState<{ flags: QualityFlag[]; answers: Answers } | null>(null);
+  const [round, setRound] = useState(0);
   const ordered = useMemo(() => {
     const items = ITEMS[id];
     return items ? interleave(items, id) : [];
@@ -122,14 +125,55 @@ export function TestClient({ id }: { id: TestId }) {
     );
   }
 
+  if (stage === "check" && pending) {
+    const retry = () => {
+      setPending(null);
+      setRound((r) => r + 1);
+      setStage("likert");
+    };
+    const keep = () => {
+      const scores = scoreScales(ordered, pending.answers);
+      if (!scores) return;
+      saveResult({ testId: id, scores, source: "test", at: Date.now(), unreliable: true });
+      finish();
+    };
+    return (
+      <Shell tone={tone}>
+        <Title sub="한쪽으로 몰려 있거나 아주 빠르게 답하셨어요. 이대로면 결과가 나와 다를 수 있어요.">
+          잠깐, 한 번만 더 볼까요?
+        </Title>
+        <div className="flex-1" />
+        <BottomBar>
+          <div className="flex flex-col gap-3">
+            <Button onClick={retry}>처음부터 다시 해 볼게요</Button>
+            <Button variant="secondary" onClick={keep}>
+              그래도 결과를 볼래요
+            </Button>
+          </div>
+        </BottomBar>
+        <p className="mt-4 text-sm font-medium leading-relaxed">
+          그래도 보기를 선택하면 이 결과는 종합 캐릭터를 정할 때 쓰지 않아요.
+        </p>
+      </Shell>
+    );
+  }
+
   return (
     <Shell tone={tone}>
       <LikertFlow
+        key={round}
+        testId={id}
         items={ordered}
         onExit={() => setStage(meta.hasInput ? "mode" : "intro")}
-        onDone={(answers) => {
+        onDone={(answers, elapsedMs) => {
           const scores = scoreScales(ordered, answers);
           if (!scores) return;
+          const flags = checkQuality(ordered, answers, elapsedMs);
+          if (flags.length > 0) {
+            setPending({ flags, answers });
+            setStage("check");
+            return;
+          }
           saveResult({ testId: id, scores, source: "test", at: Date.now() });
           finish();
         }}
@@ -140,6 +184,11 @@ export function TestClient({ id }: { id: TestId }) {
 
 function Intro({ id, onStart }: { id: TestId; onStart: () => void }) {
   const meta = TESTS[id];
+  const [resumeAt, setResumeAt] = useState<number | null>(null);
+  // 서버 렌더링과 화면이 달라지지 않도록 마운트 뒤에 읽는다.
+  useEffect(() => {
+    if (ITEMS[id]) setResumeAt(loadProgress(id)?.i ?? null);
+  }, [id]);
   const theme = TEST_THEME[id];
   return (
     <Shell tone={theme.tone}>
@@ -163,7 +212,9 @@ function Intro({ id, onStart }: { id: TestId; onStart: () => void }) {
       </p>
       <div className="flex-1" />
       <BottomBar>
-        <Button onClick={onStart}>시작할게요</Button>
+        <Button onClick={onStart}>
+          {resumeAt === null ? "시작할게요" : `이어서 할게요 (${resumeAt + 1}번째 문항부터)`}
+        </Button>
       </BottomBar>
     </Shell>
   );

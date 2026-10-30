@@ -75,6 +75,12 @@ export function ResultFrame({
           직접 입력해 주신 결과예요. 입력값은 구간(또는 방향)만 알 수 있어서 자세한 정도는 보여 드리지 못해요.
         </p>
       )}
+      {result.unreliable && (
+        <p className="mt-4 border-[3px] border-dashed border-ink px-4 py-3 text-sm font-medium">
+          답이 한쪽으로 몰려 있거나 아주 빠르게 이어져서, 이 결과는 참고만 해 주세요. 종합 캐릭터를 정할 때는
+          쓰지 않아요.
+        </p>
+      )}
       <div className="mt-8 flex flex-col gap-4">{children}</div>
       <Sources {...sources} />
       <SavePanel />

@@ -41,6 +41,8 @@ export interface StoredResult {
   source: "test" | "input";
   at: number;
   adler?: AdlerData;
+  /** 응답이 한쪽으로 몰렸거나 너무 빨라서 믿기 어려운 결과. 종합 캐릭터에서는 뺀다. */
+  unreliable?: boolean;
 }
 
 export type Level = "low" | "mid" | "high";

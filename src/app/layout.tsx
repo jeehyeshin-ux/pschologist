@@ -25,10 +25,25 @@ const dmMono = DM_Mono({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://mind.healthandchoice.com"),
   title: "마음 탐색실",
   description:
     "다섯 가지 심리학 이야기로 나를 돌아보는 자기이해 서비스. 임상 진단이나 전문 심리평가를 대체하지 않아요.",
   robots: { index: false, follow: false },
+  openGraph: {
+    title: "마음 탐색실",
+    description: "다섯 가지 심리 이야기로 나를 들여다보고, 8가지 캐릭터 중 나를 닮은 하나를 만나 보세요.",
+    siteName: "마음 탐색실",
+    locale: "ko_KR",
+    type: "website",
+    images: [{ url: "/og.png", width: 1200, height: 630, alt: "마음 탐색실" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "마음 탐색실",
+    description: "다섯 가지 심리 이야기로 나를 들여다보고, 8가지 캐릭터 중 나를 닮은 하나를 만나 보세요.",
+    images: ["/og.png"],
+  },
 };
 
 export const viewport: Viewport = {

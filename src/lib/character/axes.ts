@@ -56,6 +56,7 @@ const REQUIRED: Partial<Record<TestId, string[]>> = {
 };
 
 export function contributionsOf(result: StoredResult): Contribution[] {
+  if (result.unreliable) return [];
   const map = MAPPERS[result.testId];
   const required = REQUIRED[result.testId];
   if (!map || !required || !hasAll(result.scores, required)) return [];
